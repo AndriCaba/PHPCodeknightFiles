@@ -1,8 +1,8 @@
 <?php
-$servername = "codeknight.database.windows.net";
-$username = "cabagbag.224136@globalcity.sti.edu.ph";
-$password = "QHPjuOg9NtrinejL";
-$dbname = "CodeknightData";
+$servername = "codeknight-server";
+$username = "codeknight-server-admin";
+$password = "$jUOat$ya7$XOK58";
+$dbname = "codeknight-database";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
