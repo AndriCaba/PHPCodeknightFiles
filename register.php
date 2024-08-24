@@ -1,15 +1,18 @@
 <?php
-$servername = "tcp:codeknight-server.database.windows.net,1433";
-$username = "codeknight-server-admin";
-$password = "$jUOat$ya7$XOK58";
-$dbname = "codeknight-database";
+// SQL Server connection using sqlsrv_connect
+$connectionInfo = array(
+    "UID" => "codeknight-server-admin",
+    "pwd" => "$jUOat$ya7$XOK58", // Ensure the password is securely stored
+    "Database" => "codeknight-database",
+    "LoginTimeout" => 30,
+    "Encrypt" => 1,
+    "TrustServerCertificate" => 0
+);
+$serverName = "tcp:codeknight-server.database.windows.net,1433";
+$conn = sqlsrv_connect($serverName, $connectionInfo);
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($conn === false) {
+    die(print_r(sqlsrv_errors(), true));
 }
 
 // Get POST data and validate it
@@ -28,20 +31,22 @@ if (empty($studentID) || empty($lastName) || empty($teacher)) {
 }
 
 // Hash the password (if you are storing passwords)
-$hashedPass = password_hash($plainPassword , PASSWORD_DEFAULT);
+$hashedPass = password_hash($pass, PASSWORD_DEFAULT);
 
-// Prepare and bind
-$stmt = $conn->prepare("INSERT INTO userdata (Username, PASSWORD, StudentID, Section, Teacher, LastName, FirstName, MI) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssisssss", $user, $hashedPass, $studentID, $section, $teacher, $lastName, $firstName, $mi);
+// Prepare the SQL query
+$sql = "INSERT INTO UserData (Username, PASSWORD, StudentID, Section, Teacher, LastName, FirstName, MI) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+$params = array($user, $hashedPass, $studentID, $section, $teacher, $lastName, $firstName, $mi);
 
-// Execute the statement
-if ($stmt->execute()) {
-    echo "New record created successfully";
+// Prepare and execute the statement
+$stmt = sqlsrv_query($conn, $sql, $params);
+
+if ($stmt === false) {
+    die("Error: " . print_r(sqlsrv_errors(), true));
 } else {
-    echo "Error: " . $stmt->error;
+    echo "New record created successfully";
 }
 
 // Close the statement and connection
-$stmt->close();
-$conn->close();
+sqlsrv_free_stmt($stmt);
+sqlsrv_close($conn);
 ?>

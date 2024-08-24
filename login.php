@@ -1,37 +1,39 @@
 <?php
-$servername = "tcp:codeknight-server.database.windows.net,1433";
-$username = "codeknight-server-admin";
-$password = "$jUOat$ya7$XOK58";
-$dbname = "codeknight-database";
+// SQL Server connection using sqlsrv_connect
+$connectionInfo = array(
+    "UID" => "codeknight-server-admin",
+    "pwd" => "$jUOat$ya7$XOK58", // Make sure the password is securely stored
+    "Database" => "codeknight-database",
+    "LoginTimeout" => 30,
+    "Encrypt" => 1,
+    "TrustServerCertificate" => 0
+);
+$serverName = "tcp:codeknight-server.database.windows.net,1433";
+$conn = sqlsrv_connect($serverName, $connectionInfo);
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($conn === false) {
+    die(print_r(sqlsrv_errors(), true));
 }
 
 // Retrieve POST data
 $user = $_POST['username'];
 $pass = $_POST['password'];
 
-// Prepare and bind
-$stmt = $conn->prepare("SELECT teacher, StudentID, Lastname, Section FROM UserData WHERE Username = ? AND PASSWORD = ?");
-$stmt->bind_param("ss", $user, $pass);
+// Prepare and execute query
+$sql = "SELECT teacher, StudentID, Lastname, Section FROM UserData WHERE Username = ? AND PASSWORD = ?";
+$params = array($user, $pass);
+$stmt = sqlsrv_query($conn, $sql, $params);
 
-// Execute the statement
-$stmt->execute();
-
-// Get the result
-$result = $stmt->get_result();
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 
 // Initialize response
 $response = array();
 
-if ($result->num_rows > 0) {
-    // If login successful, retrieve the teacher's name, student ID, last name, and section
-    $userData = $result->fetch_assoc();
+if (sqlsrv_has_rows($stmt)) {
+    // If login successful, retrieve the data
+    $userData = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     $response['status'] = 'Login successful';
     $response['teacher'] = $userData['teacher'];
     $response['student_id'] = $userData['StudentID'];
@@ -39,15 +41,15 @@ if ($result->num_rows > 0) {
     $response['section'] = $userData['Section'];
 } else {
     $response['status'] = 'Invalid username or password';
-    $response['teacher'] = 'Invalid teacher';
-    $response['student_id'] = 'Invalid ID';
-    $response['lastname'] = 'Invalid Lastname';
-    $response['Section'] = 'Invalid section';
+    $response['teacher'] = null;
+    $response['student_id'] = null;
+    $response['lastname'] = null;
+    $response['section'] = null;
 }
 
-// Close the statements and connection
-$stmt->close();
-$conn->close();
+// Close the statement and connection
+sqlsrv_free_stmt($stmt);
+sqlsrv_close($conn);
 
 // Return the response as JSON
 header('Content-Type: application/json');
