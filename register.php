@@ -4,6 +4,7 @@ $connectionInfo = array(
     "UID" => "codeknight-server-admin",
     "pwd" => "PizzaMan22", // Ensure the password is securely stored  
     "Database" => "codeknight-database",
+
     "LoginTimeout" => 30,
     "Encrypt" => 1,
     "TrustServerCertificate" => 0
