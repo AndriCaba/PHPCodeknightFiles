@@ -1,5 +1,5 @@
 <?php
-$servername = "codeknight-server.database.windows.net";
+$servername = "tcp:codeknight-server.database.windows.net,1433";
 $username = "codeknight-server-admin";
 $password = "$jUOat$ya7$XOK58";
 $dbname = "codeknight-database";
