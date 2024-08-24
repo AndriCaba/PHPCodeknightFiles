@@ -2,7 +2,7 @@
 // SQL Server connection using sqlsrv_connect
 $connectionInfo = array(
     "UID" => "codeknight-server-admin",
-    "pwd" => "$jUOat$ya7$XOK58", // Ensure the password is securely stored  
+    "pwd" => "PizzaMan22", // Ensure the password is securely stored  
     "Database" => "codeknight-database",
     "LoginTimeout" => 30,
     "Encrypt" => 1,
