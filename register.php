@@ -17,14 +17,14 @@ if ($conn === false) {
 }
 
 // Get POST data and validate it
-$user = $_POST['username'] ?? '';
-$pass = $_POST['password'] ?? '';
-$studentID = $_POST['studentID'] ?? '';
-$section = $_POST['section'] ?? '';
-$teacher = $_POST['teacher'] ?? '';
-$lastName = $_POST['lastName'] ?? '';
-$firstName = $_POST['firstName'] ?? '';
-$mi = $_POST['mi'] ?? '';
+$user = $_POST['Username'] ?? '';
+$pass = $_POST['PASSWORD'] ?? '';
+$studentID = $_POST['StudentID'] ?? '';
+$section = $_POST['Section'] ?? '';
+$teacher = $_POST['Teacher'] ?? '';
+$lastName = $_POST['LastName'] ?? '';
+$firstName = $_POST['FirstName'] ?? '';
+$mi = $_POST['MI'] ?? '';
 
 // Validate required fields
 if (empty($studentID) || empty($lastName) || empty($teacher)) {
