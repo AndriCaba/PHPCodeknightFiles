@@ -10,6 +10,19 @@ $connectionInfo = array(
 );
 $serverName = "tcp:codeknight-server.database.windows.net,1433";
 $conn = sqlsrv_connect($serverName, $connectionInfo);
+<?php
+// SQL Server connection using sqlsrv_connect
+$connectionInfo = array(
+    "UID" => "codeknight-server-admin",
+    "pwd" => "PizzaMan22",  // Ensure the password is securely stored  
+    "Database" => "codeknight-database",
+    "LoginTimeout" => 30,
+    "Encrypt" => 1,
+    "TrustServerCertificate" => 0
+);
+
+$serverName = "tcp:codeknight-server.database.windows.net,1433";
+$conn = sqlsrv_connect($serverName, $connectionInfo);
 
 if ($conn === false) {
     die(print_r(sqlsrv_errors(), true));
@@ -43,7 +56,7 @@ if ($resultDates === false) {
 
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
-$date = isset($_GET['date']) ? $_GET['date'] : '';
+$date = isset($_GET['DateEnterLevel']) ? $_GET['DateEnterLevel'] : '';
 
 $sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
 $conditions = array();
