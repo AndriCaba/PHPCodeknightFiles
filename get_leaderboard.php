@@ -32,16 +32,15 @@ while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
 
 // Fetch unique dates
 $sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
-$resultDates = sqlsrv_query($conn, $sqlDates);
-
-if ($resultDates === false) {
-    die(print_r(sqlsrv_errors(), true));
-}
+$resultDates = $conn->query($sqlDates);
 
 $dates = array();
-while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
-    $dates[] = $row['DateEnterLevel'];
+if ($resultDates->num_rows > 0) {
+    while($row = $resultDates->fetch_assoc()) {
+        $dates[] = $row['DateEnterLevel'];
+    }
 }
+
 
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
