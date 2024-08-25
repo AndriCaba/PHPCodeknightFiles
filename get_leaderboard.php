@@ -41,7 +41,17 @@ if ($resultDates) {
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 
-$sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, CONVERT(VARCHAR(10), DateEnterLevel, 120) AS DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
+$sql1 = "
+    SELECT 
+        StudentID, 
+        LastName, 
+        Teacher, 
+        TopicLevel, 
+        CONVERT(VARCHAR(10), DateEnterLevel, 120) AS DateEnterLevel, 
+        CONVERT(VARCHAR(8), TimeEnterLevel, 108) AS TimeEnterLevel, 
+        TimeRecord, 
+        Section 
+    FROM UserRecord";
 $conditions = array();
 $params = array();
 
@@ -64,11 +74,7 @@ $result1 = sqlsrv_query($conn, $sql1, $params);
 $userRecords = array();
 if ($result1) {
     while($row = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
-        // Format TimeEnterLevel as HH:MM:SS
-        if (isset($row['TimeEnterLevel']) && $row['TimeEnterLevel'] !== null) {
-            $row['TimeEnterLevel'] = date('H:i:s', strtotime($row['TimeEnterLevel']));
-        }
-        
+        // No additional formatting needed, already converted in SQL query
         $userRecords[] = $row;
     }
 }
