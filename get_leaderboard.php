@@ -1,12 +1,21 @@
 <?php
-// Database connection parameters
-$servername = "tcp:codeknight-server.database.windows.net,1433";
-$username = "codeknight-server-admin";
-$password = "PizzaMan22";
-$dbname = "codeknight-database";
+// Connection parameters for mysqli
+$connectionInfo = array(
+    "servername" => "codeknight-server.database.windows.net",
+    "username" => "codeknight-server-admin",
+    "password" => "PizzaMan22",
+    "dbname" => "codeknight-database",
+    "port" => 1433
+);
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Create connection using mysqli
+$conn = new mysqli(
+    $connectionInfo["servername"],
+    $connectionInfo["username"],
+    $connectionInfo["password"],
+    $connectionInfo["dbname"],
+    $connectionInfo["port"]
+);
 
 // Check connection
 if ($conn->connect_error) {
@@ -19,7 +28,7 @@ $resultSections = $conn->query($sqlSections);
 
 $sections = array();
 if ($resultSections->num_rows > 0) {
-    while($row = $resultSections->fetch_assoc()) {
+    while ($row = $resultSections->fetch_assoc()) {
         $sections[] = $row['Section'];
     }
 }
@@ -30,7 +39,7 @@ $resultDates = $conn->query($sqlDates);
 
 $dates = array();
 if ($resultDates->num_rows > 0) {
-    while($row = $resultDates->fetch_assoc()) {
+    while ($row = $resultDates->fetch_assoc()) {
         $dates[] = $row['DateEnterLevel'];
     }
 }
@@ -58,7 +67,7 @@ $result1 = $conn->query($sql1);
 
 $userRecords = array();
 if ($result1->num_rows > 0) {
-    while($row = $result1->fetch_assoc()) {
+    while ($row = $result1->fetch_assoc()) {
         $userRecords[] = $row;
     }
 }
