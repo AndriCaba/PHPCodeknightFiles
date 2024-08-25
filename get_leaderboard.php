@@ -43,6 +43,9 @@ if ($resultDates !== false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
+// Convert dates array to a comma-separated string
+$datesString = implode(", ", $dates);
+
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
@@ -78,7 +81,7 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
 
 $response = array(
     "sections" => $sections,
-    "dates" => $dates,
+    "dates" => $datesString, // Use the comma-separated dates string
     "userRecords" => $userRecords
 );
 
