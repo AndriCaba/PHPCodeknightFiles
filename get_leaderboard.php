@@ -1,5 +1,4 @@
 <?php
-// SQL Server connection using sqlsrv_connect
 $connectionInfo = array(
     "UID" => "codeknight-server-admin",
     "pwd" => "PizzaMan22", // Ensure the password is securely stored  
@@ -15,7 +14,6 @@ if ($conn === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Fetch unique sections
 $sqlSections = "SELECT DISTINCT Section FROM UserRecord";
 $resultSections = sqlsrv_query($conn, $sqlSections);
 
@@ -28,7 +26,6 @@ if ($resultSections === false) {
     }
 }
 
-// Fetch unique dates
 $sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
 $resultDates = sqlsrv_query($conn, $sqlDates);
 
@@ -41,7 +38,6 @@ if ($resultDates === false) {
     }
 }
 
-// SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 
@@ -83,6 +79,5 @@ $response = array(
 
 echo json_encode($response);
 
-// Close the connection
 sqlsrv_close($conn);
 ?>
