@@ -1,36 +1,42 @@
 <?php
-$servername = "codeknight.database.windows.net";
-$username = "cabagbag.224136@globalcity.sti.edu.ph";
-$password = "QHPjuOg9NtrinejL";
-$dbname = "CodeknightData";
+// SQL Server connection using sqlsrv_connect
+$connectionInfo = array(
+    "UID" => "codeknight-server-admin",
+    "pwd" => "PizzaMan22", // Ensure the password is securely stored  
+    "Database" => "codeknight-database",
+    "LoginTimeout" => 30,
+    "Encrypt" => 1,
+    "TrustServerCertificate" => 0
+);
+$serverName = "tcp:codeknight-server.database.windows.net,1433";
+$conn = sqlsrv_connect($serverName, $connectionInfo);
 
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($conn === false) {
+    die(print_r(sqlsrv_errors(), true));
 }
 
 // Fetch unique sections
 $sqlSections = "SELECT DISTINCT Section FROM UserRecord";
-$resultSections = $conn->query($sqlSections);
+$resultSections = sqlsrv_query($conn, $sqlSections);
 
 $sections = array();
-if ($resultSections->num_rows > 0) {
-    while($row = $resultSections->fetch_assoc()) {
+if ($resultSections === false) {
+    die(print_r(sqlsrv_errors(), true));
+} else {
+    while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
         $sections[] = $row['Section'];
     }
 }
 
 // Fetch unique dates
 $sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
-$resultDates = $conn->query($sqlDates);
+$resultDates = sqlsrv_query($conn, $sqlDates);
 
 $dates = array();
-if ($resultDates->num_rows > 0) {
-    while($row = $resultDates->fetch_assoc()) {
+if ($resultDates === false) {
+    die(print_r(sqlsrv_errors(), true));
+} else {
+    while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
         $dates[] = $row['DateEnterLevel'];
     }
 }
@@ -43,22 +49,28 @@ $sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, DateEnterLevel, TimeEn
 $conditions = array();
 
 if ($section) {
-    $conditions[] = "Section = '" . $conn->real_escape_string($section) . "'";
+    $conditions[] = "Section = ?";
 }
 
 if ($date) {
-    $conditions[] = "DateEnterLevel = '" . $conn->real_escape_string($date) . "'";
+    $conditions[] = "DateEnterLevel = ?";
 }
 
 if (count($conditions) > 0) {
     $sql1 .= " WHERE " . implode(' AND ', $conditions);
 }
 
-$result1 = $conn->query($sql1);
+$params = array();
+if ($section) $params[] = $section;
+if ($date) $params[] = $date;
+
+$result1 = sqlsrv_query($conn, $sql1, $params);
 
 $userRecords = array();
-if ($result1->num_rows > 0) {
-    while($row = $result1->fetch_assoc()) {
+if ($result1 === false) {
+    die(print_r(sqlsrv_errors(), true));
+} else {
+    while ($row = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
         $userRecords[] = $row;
     }
 }
@@ -71,5 +83,6 @@ $response = array(
 
 echo json_encode($response);
 
-$conn->close();
+// Close the connection
+sqlsrv_close($conn);
 ?>
