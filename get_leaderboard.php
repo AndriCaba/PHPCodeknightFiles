@@ -22,7 +22,7 @@ $resultSections = sqlsrv_query($conn, $sqlSections);
 $sections = array();
 if ($resultSections) {
     while($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
-        $sections[] = (string)$row['Section'];  // Casting as string
+        $sections[] = $row['Section'];
     }
 }
 
@@ -33,17 +33,16 @@ $resultDates = sqlsrv_query($conn, $sqlDates);
 $dates = array();
 if ($resultDates) {
     while($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
-        $dates[] = (string)$row['DateEnterLevel'];  // Casting as string
+        $dates[] = $row['DateEnterLevel'];
     }
 }
 
 // SQL query to get leaderboard data
-$section = isset($_GET['section']) ? (string)$_GET['section'] : '';  // Casting as string
-$date = isset($_GET['date']) ? (string)$_GET['date'] : '';  // Casting as string
+$section = isset($_GET['section']) ? $_GET['section'] : '';
+$date = isset($_GET['date']) ? $_GET['date'] : '';
 
 $sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
 $conditions = array();
-$params = array();
 
 if ($section) {
     $conditions[] = "Section = ?";
@@ -64,16 +63,7 @@ $result1 = sqlsrv_query($conn, $sql1, $params);
 $userRecords = array();
 if ($result1) {
     while($row = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
-        $userRecords[] = array(
-            "StudentID" => (int)$row['StudentID'],  // Casting as integer
-            "LastName" => (string)$row['LastName'],  // Casting as string
-            "Teacher" => (string)$row['Teacher'],  // Casting as string
-            "TopicLevel" => (string)$row['TopicLevel'],  // Casting as string
-            "DateEnterLevel" => (string)$row['DateEnterLevel'],  // Casting as string
-            "TimeEnterLevel" => (string)$row['TimeEnterLevel'],  // Casting as string
-            "TimeRecord" => (string)$row['TimeRecord'],  // Casting as string
-            "Section" => (string)$row['Section']  // Casting as string
-        );
+        $userRecords[] = $row;
     }
 }
 
