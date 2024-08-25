@@ -1,12 +1,12 @@
 <?php
 // Database connection parameters
-$servername = "codeknight-server.database.windows.net";
+$servername = "tcp:codeknight-server.database.windows.net,1433";
 $username = "codeknight-server-admin";
 $password = "PizzaMan22";
 $dbname = "codeknight-database";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname, 1433);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
