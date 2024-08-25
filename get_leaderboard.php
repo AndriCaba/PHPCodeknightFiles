@@ -1,20 +1,21 @@
 <?php
-// SQL Server connection parameters
-$connectionInfo = array(
-    "UID" => "codeknight-server-admin",
-    "pwd" => "PizzaMan22", // Ensure the password is securely stored  
-    "Database" => "codeknight-database",
-    "LoginTimeout" => 30,
-    "Encrypt" => 1,
-    "TrustServerCertificate" => 0
-);
+
+// Securely store database credentials (e.g., environment variables)
 $serverName = "tcp:codeknight-server.database.windows.net,1433";
+$connectionInfo = array(
+  "UID" => "codeknight-server-admin",
+  "pwd" => getenv('DATABASE_PASSWORD'), // Access password from environment variable
+  "Database" => "codeknight-database",
+  "LoginTimeout" => 30,
+  "Encrypt" => 1,
+  "TrustServerCertificate" => 0
+);
 
 // Create connection using sqlsrv
 $conn = sqlsrv_connect($serverName, $connectionInfo);
 
 if ($conn === false) {
-    die(print_r(sqlsrv_errors(), true));
+  handle_error(sqlsrv_errors()); // Custom function for error handling
 }
 
 // Fetch unique sections
@@ -23,11 +24,11 @@ $resultSections = sqlsrv_query($conn, $sqlSections);
 
 $sections = array();
 if ($resultSections !== false) {
-    while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
-        $sections[] = $row['Section'];
-    }
+  while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
+    $sections[] = $row['Section'];
+  }
 } else {
-    die(print_r(sqlsrv_errors(), true));
+  handle_error(sqlsrv_errors());
 }
 
 // Fetch unique dates
@@ -36,17 +37,16 @@ $resultDates = sqlsrv_query($conn, $sqlDates);
 
 $dates = array();
 if ($resultDates !== false) {
-    while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
-        $dates[] = $row['DateEnterLevel'];
-    }
+  while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
+    $dates[] = $row['DateEnterLevel'];
+  }
 } else {
-    die(print_r(sqlsrv_errors(), true));
+  handle_error(sqlsrv_errors());
 }
 
-// Convert dates array to a comma-separated string, or set it to an empty string if no dates
 $datesString = !empty($dates) ? implode(", ", array_map('strval', $dates)) : '';
 
-// SQL query to get leaderboard data
+// Prepare SQL query with parameters
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 
@@ -55,35 +55,38 @@ $conditions = array();
 $params = array();
 
 if ($section) {
-    $conditions[] = "Section = ?";
-    $params[] = $section;
+  $conditions[] = "Section = ?";
+  $params[] = $section;
 }
 
 if ($date) {
-    $conditions[] = "DateEnterLevel = ?";
-    $params[] = $date;
+  $conditions[] = "DateEnterLevel = ?";
+  $params[] = $date;
 }
 
 if (count($conditions) > 0) {
-    $sql1 .= " WHERE " . implode(' AND ', $conditions);
+  $sql1 .= " WHERE " . implode(' AND ', $conditions);
 }
 
-// Prepare and execute the query
-$stmt = sqlsrv_query($conn, $sql1, $params);
-
+// Prepare and execute the query with parameters
+$stmt = sqlsrv_prepare($conn, $sql1);
 if ($stmt === false) {
-    die(print_r(sqlsrv_errors(), true));
+  handle_error(sqlsrv_errors());
+}
+
+if (sqlsrv_execute($stmt, $params) === false) {
+  handle_error(sqlsrv_errors($stmt)); // Get errors specific to the statement
 }
 
 $userRecords = array();
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-    $userRecords[] = $row;
+  $userRecords[] = $row;
 }
 
 $response = array(
-    "sections" => $sections,
-    "dates" => $datesString, // Use the comma-separated dates string
-    "userRecords" => $userRecords
+  "sections" => $sections,
+  "dates" => $datesString,
+  "userRecords" => $userRecords
 );
 
 echo json_encode($response);
