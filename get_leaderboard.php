@@ -43,8 +43,8 @@ if ($resultDates !== false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Convert dates array to a comma-separated string
-$datesString = implode(", ", $dates);
+// Convert dates array to a comma-separated string, or set it to an empty string if no dates
+$datesString = !empty($dates) ? implode(", ", array_map('strval', $dates)) : '';
 
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
@@ -68,6 +68,7 @@ if (count($conditions) > 0) {
     $sql1 .= " WHERE " . implode(' AND ', $conditions);
 }
 
+// Prepare and execute the query
 $stmt = sqlsrv_query($conn, $sql1, $params);
 
 if ($stmt === false) {
