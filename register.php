@@ -4,7 +4,6 @@ $connectionInfo = array(
     "UID" => "codeknight-server-admin",
     "pwd" => "PizzaMan22", // Ensure the password is securely stored  
     "Database" => "codeknight-database",
-
     "LoginTimeout" => 30,
     "Encrypt" => 1,
     "TrustServerCertificate" => 0
@@ -31,12 +30,12 @@ if (empty($studentID) || empty($lastName) || empty($teacher)) {
     die("Error: StudentID, LastName, and Teacher are required fields.");
 }
 
-// Hash the password (if you are storing passwords)
-$hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+// Use the plain text password
+$plainPass = $pass;
 
 // Prepare the SQL query
 $sql = "INSERT INTO UserData (Username, PASSWORD, StudentID, Section, Teacher, LastName, FirstName, MI) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-$params = array($user, $hashedPass, $studentID, $section, $teacher, $lastName, $firstName, $mi);
+$params = array($user, $plainPass, $studentID, $section, $teacher, $lastName, $firstName, $mi);
 
 // Prepare and execute the statement
 $stmt = sqlsrv_query($conn, $sql, $params);
