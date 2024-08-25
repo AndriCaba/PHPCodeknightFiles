@@ -1,8 +1,7 @@
 <?php
-// SQL Server connection using sqlsrv_connect
 $connectionInfo = array(
     "UID" => "codeknight-server-admin",
-    "pwd" => "PizzaMan22", // Ensure the password is securely stored  
+    "PWD" => "PizzaMan22", // Ensure the password is securely stored  
     "Database" => "codeknight-database",
     "LoginTimeout" => 30,
     "Encrypt" => 1,
@@ -19,26 +18,26 @@ if ($conn === false) {
 $sqlSections = "SELECT DISTINCT Section FROM UserRecord";
 $resultSections = sqlsrv_query($conn, $sqlSections);
 
-$sections = array();
 if ($resultSections === false) {
     die(print_r(sqlsrv_errors(), true));
-} else {
-    while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
-        $sections[] = $row['Section'];
-    }
+}
+
+$sections = array();
+while($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
+    $sections[] = $row['Section'];
 }
 
 // Fetch unique dates
 $sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
 $resultDates = sqlsrv_query($conn, $sqlDates);
 
-$dates = array();
 if ($resultDates === false) {
     die(print_r(sqlsrv_errors(), true));
-} else {
-    while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
-        $dates[] = $row['DateEnterLevel'];
-    }
+}
+
+$dates = array();
+while($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
+    $dates[] = $row['DateEnterLevel'];
 }
 
 // SQL query to get leaderboard data
@@ -61,18 +60,22 @@ if (count($conditions) > 0) {
 }
 
 $params = array();
-if ($section) $params[] = $section;
-if ($date) $params[] = $date;
+if ($section) {
+    $params[] = $section;
+}
+if ($date) {
+    $params[] = $date;
+}
 
-$result1 = sqlsrv_query($conn, $sql1, $params);
+$stmt = sqlsrv_query($conn, $sql1, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 
 $userRecords = array();
-if ($result1 === false) {
-    die(print_r(sqlsrv_errors(), true));
-} else {
-    while ($row = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
-        $userRecords[] = $row;
-    }
+while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    $userRecords[] = $row;
 }
 
 $response = array(
@@ -83,6 +86,5 @@ $response = array(
 
 echo json_encode($response);
 
-// Close the connection
 sqlsrv_close($conn);
 ?>
