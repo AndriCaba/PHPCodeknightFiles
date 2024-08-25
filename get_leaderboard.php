@@ -21,26 +21,27 @@ if ($conn === false) {
 $sqlSections = "SELECT DISTINCT Section FROM UserRecord";
 $resultSections = sqlsrv_query($conn, $sqlSections);
 
-if ($resultSections === false) {
-    die(print_r(sqlsrv_errors(), true));
-}
-
 $sections = array();
-while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
-    $sections[] = $row['Section'];
+if ($resultSections !== false) {
+    while ($row = sqlsrv_fetch_array($resultSections, SQLSRV_FETCH_ASSOC)) {
+        $sections[] = $row['Section'];
+    }
+} else {
+    die(print_r(sqlsrv_errors(), true));
 }
 
 // Fetch unique dates
 $sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
-$resultDates = $conn->query($sqlDates);
+$resultDates = sqlsrv_query($conn, $sqlDates);
 
 $dates = array();
-if ($resultDates->num_rows > 0) {
-    while($row = $resultDates->fetch_assoc()) {
+if ($resultDates !== false) {
+    while ($row = sqlsrv_fetch_array($resultDates, SQLSRV_FETCH_ASSOC)) {
         $dates[] = $row['DateEnterLevel'];
     }
+} else {
+    die(print_r(sqlsrv_errors(), true));
 }
-
 
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
@@ -48,25 +49,20 @@ $date = isset($_GET['date']) ? $_GET['date'] : '';
 
 $sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
 $conditions = array();
+$params = array();
 
 if ($section) {
     $conditions[] = "Section = ?";
+    $params[] = $section;
 }
 
 if ($date) {
     $conditions[] = "DateEnterLevel = ?";
+    $params[] = $date;
 }
 
 if (count($conditions) > 0) {
     $sql1 .= " WHERE " . implode(' AND ', $conditions);
-}
-
-$params = array();
-if ($section) {
-    $params[] = $section;
-}
-if ($date) {
-    $params[] = $date;
 }
 
 $stmt = sqlsrv_query($conn, $sql1, $params);
