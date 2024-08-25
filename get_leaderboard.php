@@ -41,6 +41,15 @@ if ($resultDates === false) {
     }
 }
 
+// Debugging output to check dates
+print_r($dates);
+
+if (empty($dates)) {
+    echo "No dates were fetched from the database.";
+} else {
+    echo "Dates fetched: " . implode(", ", $dates);
+}
+
 // SQL query to get leaderboard data
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
