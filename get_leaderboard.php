@@ -26,8 +26,8 @@ if ($resultSections) {
     }
 }
 
-// Fetch unique dates
-$sqlDates = "SELECT DISTINCT DateEnterLevel FROM UserRecord";
+// Fetch unique dates and format them
+$sqlDates = "SELECT DISTINCT CONVERT(VARCHAR(10), DateEnterLevel, 120) AS DateEnterLevel FROM UserRecord";
 $resultDates = sqlsrv_query($conn, $sqlDates);
 
 $dates = array();
@@ -41,8 +41,9 @@ if ($resultDates) {
 $section = isset($_GET['section']) ? $_GET['section'] : '';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 
-$sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
+$sql1 = "SELECT StudentID, LastName, Teacher, TopicLevel, CONVERT(VARCHAR(10), DateEnterLevel, 120) AS DateEnterLevel, TimeEnterLevel, TimeRecord, Section FROM UserRecord";
 $conditions = array();
+$params = array();
 
 if ($section) {
     $conditions[] = "Section = ?";
@@ -50,7 +51,7 @@ if ($section) {
 }
 
 if ($date) {
-    $conditions[] = "DateEnterLevel = ?";
+    $conditions[] = "CONVERT(VARCHAR(10), DateEnterLevel, 120) = ?";
     $params[] = $date;
 }
 
